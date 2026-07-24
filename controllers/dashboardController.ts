@@ -1,40 +1,25 @@
-import { db } from '@/services/DatabaseAdapter';
-import { SurtidorFactory } from '@/models/SurtidorFactory';
+import { db } from '../services/DatabaseAdapter';
 
-export async function getDashboardData() {
-  try {
-    const surtidoresRaw = await db.get('surtidores');
-    const ventasRaw = await db.get('ventas');
-    const alertasRaw = await db.get('alertas', { estado: false });
+export class DashboardController {
+  static async obtenerEstadisticas() {
+    try {
+      const surtidores = await db.get('Surtidores') as { id: number, numero: number, combustible: string, capacidad: number, nivel: number, estado: string }[];
+      const alertas = await db.get('Alertas', { estado: 'Pendiente' }) as unknown[];
+      const ventas = await db.get('Ventas') as { total: number }[];
 
-    const surtidores = (surtidoresRaw || []).map((row: any) => {
-      // 1. Usamos la clase Factory
-      const s = SurtidorFactory.crearSurtidor(row.combustible, row.numero, row.capacidad);
-      s.id = row.id;
-      s.nivel_actual = row.nivel;
-      s.estadoBinario = row.estado_binario || 1;
-      
-      // 2. SOLUCIÓN: Convertimos la Clase a un Objeto Plano para que Next.js lo acepte
+      const totalIngresos = ventas.reduce((acc: number, venta: { total: number }) => acc + venta.total, 0);
+      const combustibleTotal = surtidores.reduce((acc: number, surtidor: { nivel: number }) => acc + surtidor.nivel, 0);
+
       return {
-        id: s.id,
-        numero: s.numero,
-        combustible: s.combustible,
-        capacidad: s.capacidad,
-        nivel_actual: s.nivel_actual,
-        estadoBinario: s.estadoBinario,
-        unidad: s.unidad
+        surtidores,
+        alertasActivas: alertas.length,
+        totalIngresos,
+        combustibleTotal,
+        ventasRealizadas: ventas.length
       };
-    });
-
-    const totalVentasHoy = (ventasRaw || []).reduce((acc: number, v: any) => acc + Number(v.total || 0), 0);
-
-    return {
-      surtidores: surtidores.sort((a: any, b: any) => a.numero - b.numero),
-      totalVentasHoy: totalVentasHoy.toFixed(2),
-      alertasActivas: alertasRaw ? alertasRaw.length : 0
-    };
-  } catch (error) {
-    console.error("Error cargando dashboard:", error);
-    return { surtidores: [], totalVentasHoy: "0.00", alertasActivas: 0 };
+    } catch (error) {
+      console.error("Error cargando estadísticas del dashboard:", error);
+      throw new Error("No se pudieron cargar los datos del sistema");
+    }
   }
 }

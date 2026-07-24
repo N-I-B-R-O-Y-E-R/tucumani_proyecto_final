@@ -1,85 +1,95 @@
 'use client';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { db } from '@/services/DatabaseAdapter';
+
+// Interfaz estricta para el linter
+interface IUsuario {
+  nombre: string;
+  rol: string;
+}
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [cargando, setCargando] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     setError('');
-    setCargando(true);
 
     try {
-      // 1. Intentar iniciar sesión
-      const { error: authError } = await db.client.auth.signInWithPassword({ 
-        email, 
-        password 
-      });
-
-      if (authError) {
-        // Si Supabase lo rechaza, mostramos el error y soltamos el botón
-        setError('Error: ' + authError.message);
-        setCargando(false);
+      // Consulta real a la base de datos usando nuestro Adapter
+      const usuarios = await db.get('Usuarios', { email, password }) as IUsuario[];
+      
+      if (usuarios && usuarios.length > 0) {
+        const usuario = usuarios[0];
+        
+        // Guardamos los datos de la sesión
+        localStorage.setItem('userRole', usuario.rol);
+        localStorage.setItem('userName', usuario.nombre);
+        
+        // Redirección por roles
+        if (usuario.rol === 'Cajero') {
+          router.push('/ventas');
+        } else {
+          router.push('/');
+        }
       } else {
-        // 2. Si entra, forzamos la recarga de página directo a la raíz. 
-        // Esto ignora cualquier traba de Next.js.
-        window.location.href = '/';
+        setError('Credenciales inválidas. Verifique su correo y contraseña.');
       }
-    } catch (err: any) {
-      // 3. Si hay un error de red o de código, destrabamos el botón
-      console.error(err);
-      setError('Error interno de conexión. Revisa la consola.');
-      setCargando(false);
+    } catch (_err) {
+      console.error(_err);
+      setError('Error de conexión con el servidor.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 absolute top-0 left-0 w-full z-50">
+    <div className="min-h-screen flex items-center justify-center bg-slate-900 absolute top-0 left-0 w-full z-50">
       <div className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-extrabold text-gray-800">Sistema Operativo</h1>
-          <p className="text-gray-500 mt-2">Acceso Corporativo</p>
+          <h1 className="text-4xl font-bold text-slate-900 mb-2">⛽ CosmosGas</h1>
+          <p className="text-slate-500">Sistema de Gestión Multiplataforma</p>
         </div>
-        
-        {error && (
-          <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
-            <p className="text-red-700 text-sm font-bold">{error}</p>
-          </div>
-        )}
-        
-        <form onSubmit={handleLogin} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
+
+        {error && <div className="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm font-semibold">{error}</div>}
+
+        <form onSubmit={handleLogin}>
+          <div className="mb-4">
+            <label className="block text-gray-700 mb-2 font-medium">Correo Electrónico</label>
             <input 
-              type="email" 
-              required 
-              className="block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 text-black" 
-              value={email} 
-              onChange={(e) => setEmail(e.target.value)} 
+              type="email" required
+              className="w-full border p-3 rounded focus:ring-2 focus:ring-blue-600 outline-none"
+              placeholder="admin@cosmosgas.com"
+              value={email} onChange={(e) => setEmail(e.target.value)}
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+          <div className="mb-6">
+            <label className="block text-gray-700 mb-2 font-medium">Contraseña</label>
             <input 
-              type="password" 
-              required 
-              className="block w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 text-black" 
-              value={password} 
-              onChange={(e) => setPassword(e.target.value)} 
+              type="password" required
+              className="w-full border p-3 rounded focus:ring-2 focus:ring-blue-600 outline-none"
+              placeholder="••••••••"
+              value={password} onChange={(e) => setPassword(e.target.value)}
             />
           </div>
           <button 
             type="submit" 
-            disabled={cargando} 
-            className="w-full bg-blue-600 text-white p-3 rounded-md hover:bg-blue-700 transition font-bold disabled:bg-gray-400"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white font-bold py-3 rounded hover:bg-blue-700 transition"
           >
-            {cargando ? 'Verificando...' : 'Iniciar Sesión'}
+            {loading ? 'Verificando credenciales...' : 'Ingresar al Sistema'}
           </button>
         </form>
+        
+        <div className="mt-6 text-sm text-gray-500 text-center">
+          Roles disponibles: Administrador, Cajero, Supervisor
+        </div>
       </div>
     </div>
   );

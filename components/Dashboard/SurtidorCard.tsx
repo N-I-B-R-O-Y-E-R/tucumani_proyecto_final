@@ -1,28 +1,46 @@
-'use client';
-import { Surtidor } from '@/models/SurtidorFactory';
+import React from 'react';
 
-export default function SurtidorCard({ surtidor }: { surtidor: Surtidor }) {
-  const nivel = Number(surtidor.nivel_actual) || 0;
-  const capacidad = Number(surtidor.capacidad) || 1;
-  const porcentaje = (nivel / capacidad) * 100;
-  const colorBarra = porcentaje < 20 ? 'bg-red-600' : porcentaje < 50 ? 'bg-yellow-500' : 'bg-green-500';
+// Interfaz para definir las propiedades (Props) del componente
+interface SurtidorProps {
+  surtidor: {
+    id: number;
+    numero: number;
+    combustible: string;
+    capacidad: number;
+    nivel: number;
+    estado: string;
+  };
+}
+
+export default function SurtidorCard({ surtidor }: SurtidorProps) {
+  // Cálculo de porcentaje para la barra visual
+  const porcentaje = (surtidor.nivel / surtidor.capacidad) * 100;
+  
+  // Lógica de colores basada en el nivel
+  const colorAlerta = porcentaje < 20 ? 'bg-red-500' : porcentaje < 50 ? 'bg-yellow-500' : 'bg-green-500';
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-bold text-gray-800">Bomba #{surtidor.numero}</h3>
-        <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">{surtidor.combustible}</span>
+    <div className="p-5 border rounded-xl shadow-md bg-white hover:shadow-lg transition-shadow">
+      <div className="flex justify-between items-center mb-3">
+        <h3 className="text-xl font-bold text-gray-800">Surtidor #{surtidor.numero}</h3>
+        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${surtidor.estado === 'Activo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+          {surtidor.estado}
+        </span>
       </div>
-      <div className="mb-2 flex justify-between text-sm text-gray-600">
-        <span>Nivel: {nivel.toFixed(2)} / {capacidad} {surtidor.unidad}</span>
-        <span className="font-bold">{porcentaje.toFixed(1)}%</span>
+      
+      <p className="text-gray-600 font-medium mb-2">{surtidor.combustible}</p>
+      
+      {/* Barra de nivel de combustible */}
+      <div className="mt-3 h-4 w-full bg-gray-200 rounded-full overflow-hidden border border-gray-300">
+        <div 
+          className={`h-full ${colorAlerta} transition-all duration-500 ease-in-out`} 
+          style={{ width: `${Math.max(0, porcentaje)}%` }}
+        ></div>
       </div>
-      <div className="w-full bg-gray-200 rounded-full h-2.5 mb-1">
-        <div className={`h-2.5 rounded-full ${colorBarra} transition-all duration-500`} style={{ width: `${Math.min(porcentaje, 100)}%` }}></div>
-      </div>
-      <div className="mt-4 flex justify-end">
-        <span className="text-xs text-gray-400 font-mono bg-gray-50 px-2 py-1 rounded">BIN: {Number(surtidor.estadoBinario).toString(2).padStart(3, '0')}</span>
-      </div>
+      
+      <p className="text-sm mt-2 text-right font-mono text-gray-700">
+        {surtidor.nivel.toFixed(2)}L / {surtidor.capacidad}L
+      </p>
     </div>
   );
 }

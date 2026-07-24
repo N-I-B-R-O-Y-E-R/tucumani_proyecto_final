@@ -1,26 +1,27 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* 
+  Establecemos los colores globales directamente en CSS puro 
+  para evitar conflictos con el compilador.
+*/
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #f3f4f6; /* Fondo gris súper claro (bg-gray-100) */
+  color: #1e293b; /* Texto oscuro elegante (text-slate-800) */
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Estilos para limpiar la generación de PDF */
+@media print {
+  .no-print, aside { display: none !important; }
+  .printable-area { width: 100%; margin: 0; padding: 0; }
+}
+
+/* Animación del Asistente Flotante */
+@keyframes bounce-short {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.animate-bounce-short {
+  animation: bounce-short 1s ease-in-out 1;
 }
