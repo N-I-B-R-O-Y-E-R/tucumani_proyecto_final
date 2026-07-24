@@ -13,7 +13,6 @@ export default function SurtidoresPage() {
   const [capacidad, setCapacidad] = useState('10000');
   const router = useRouter();
 
-  // Estados para UI Premium
   const [toast, setToast] = useState({ visible: false, mensaje: '', tipo: 'success' });
   const [modal, setModal] = useState({ isOpen: false, id: 0, numero: 0, nivelActual: 0, capacidadMaxima: 0 });
   const [litrosRecarga, setLitrosRecarga] = useState('');
@@ -43,7 +42,6 @@ export default function SurtidoresPage() {
     } finally { setLoading(false); }
   };
 
-  // Función que ejecuta el modal
   const confirmarRecarga = async (e: React.FormEvent) => {
     e.preventDefault();
     const cantidad = parseFloat(litrosRecarga);

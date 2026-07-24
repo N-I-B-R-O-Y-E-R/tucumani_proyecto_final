@@ -25,15 +25,12 @@ export default function ReportesPage() {
     cargarDatos();
   }, []);
 
-  // 🚀 MOTOR DE EXPORTACIÓN MEJORADO (Usa Blob y Punto y Coma)
   const exportarCSV = () => {
     const esVentas = vistaActiva === 'ventas';
     
-    // \uFEFF obliga a Microsoft Excel a respetar los acentos (UTF-8 BOM)
     let csvContent = "\uFEFF"; 
     
     if (esVentas) {
-      // Usamos punto y coma (;) para que Excel lo separe perfectamente en columnas
       csvContent += "ID Transaccion;Fecha;Combustible;Litros;Total (Bs)\n";
       ventas.forEach(v => {
         csvContent += `${v.id};"${new Date(v.fecha).toLocaleString()}";"${v.combustible}";${v.litros};${v.total.toFixed(2)}\n`;
@@ -41,12 +38,10 @@ export default function ReportesPage() {
     } else {
       csvContent += "ID Evento;Fecha;Surtidor Afectado;Detalle Movimiento;Estado Sistema\n";
       eventos.forEach(e => {
-        // Quitamos el símbolo '#' para evitar conflictos, o lo metemos limpio gracias al Blob
         csvContent += `${e.id};"${new Date(e.fecha).toLocaleString()}";"Surtidor ${e.surtidor_id}";"${e.tipo}";"${e.estado}"\n`;
       });
     }
 
-    // 📦 Creamos un Archivo Real (Blob) en lugar de una URL de texto gigante
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     
@@ -57,7 +52,6 @@ export default function ReportesPage() {
     link.click();
     document.body.removeChild(link);
     
-    // Limpiamos la memoria del navegador
     URL.revokeObjectURL(url);
   };
 

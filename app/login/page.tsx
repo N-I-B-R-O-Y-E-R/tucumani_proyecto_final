@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { db } from '@/services/DatabaseAdapter';
 
-// Interfaz estricta para el linter
 interface IUsuario {
   nombre: string;
   rol: string;
@@ -22,17 +21,14 @@ export default function LoginPage() {
     setError('');
 
     try {
-      // Consulta real a la base de datos usando nuestro Adapter
       const usuarios = await db.get('Usuarios', { email, password }) as IUsuario[];
       
       if (usuarios && usuarios.length > 0) {
         const usuario = usuarios[0];
         
-        // Guardamos los datos de la sesión
         localStorage.setItem('userRole', usuario.rol);
         localStorage.setItem('userName', usuario.nombre);
         
-        // Redirección por roles
         if (usuario.rol === 'Cajero') {
           router.push('/ventas');
         } else {

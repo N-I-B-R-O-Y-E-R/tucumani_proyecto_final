@@ -1,6 +1,5 @@
 import React from 'react';
 
-// Interfaz para definir las propiedades (Props) del componente
 interface SurtidorProps {
   surtidor: {
     id: number;
@@ -13,10 +12,8 @@ interface SurtidorProps {
 }
 
 export default function SurtidorCard({ surtidor }: SurtidorProps) {
-  // Cálculo de porcentaje para la barra visual
   const porcentaje = (surtidor.nivel / surtidor.capacidad) * 100;
   
-  // Lógica de colores basada en el nivel
   const colorAlerta = porcentaje < 20 ? 'bg-red-500' : porcentaje < 50 ? 'bg-yellow-500' : 'bg-green-500';
 
   return (

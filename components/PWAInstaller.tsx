@@ -11,5 +11,5 @@ export default function PWAInstaller() {
     }
   }, []);
 
-  return null; // No renderiza HTML, solo ejecuta el efecto en el cliente
+  return null; 
 }

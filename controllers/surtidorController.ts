@@ -25,13 +25,11 @@ export class SurtidorController {
         nivel: nuevoNivel, estado: 'Activo'
       });
 
-      // 1. Apagar alertas críticas
       const alertasPendientes = await db.get('Alertas', { surtidor_id: id, estado: 'Pendiente' }) as any[];
       for (const alerta of alertasPendientes) {
         await db.update('Alertas', alerta.id.toString(), { estado: 'Resuelta' });
       }
 
-      // 2. Guardar en el historial de Reportes exactamente cuántos litros entraron
       await db.insert('Alertas', {
         surtidor_id: id,
         tipo: `🚚 Ingreso de Cisterna: +${cantidad} L/m³`,

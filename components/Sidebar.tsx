@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 export default function Sidebar() {
   const pathname = usePathname();
 
-  // Si estamos en la página de login, ocultamos el menú lateral completamente
   if (pathname === '/login') return null;
 
   return (

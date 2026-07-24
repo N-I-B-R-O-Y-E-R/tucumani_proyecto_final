@@ -16,5 +16,4 @@ export class AlertSubject {
   }
 }
 
-// Instancia global para usar en toda la app (ej. cuando el nivel baje)
 export const alertSystem = new AlertSubject();
