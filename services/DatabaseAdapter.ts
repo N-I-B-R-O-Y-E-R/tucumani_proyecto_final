@@ -13,8 +13,11 @@ export class SupabaseAdapter extends DatabaseAdapter {
 
   constructor() {
     super();
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+    
+    // Si Vercel no lee las variables de entorno durante el build, usará estas cadenas directas y no crasheará
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://toiqgwqvyobgyzczbcmk.supabase.co';
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvaXFnd3F2eW9iZ3l6Y3piY21rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3MTkxNTgsImV4cCI6MjEwMDI5NTE1OH0.dGwqwl96Z9sywMJH6EDjDUkbBFV8HOB0uB57VqRgzcg';
+    
     this.client = createClient(supabaseUrl, supabaseKey);
   }
 
