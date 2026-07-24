@@ -1,10 +1,11 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
+// AQUÍ ESTÁ LA CORRECCIÓN: Ahora la clase padre define exactamente los mismos parámetros que el hijo
 class DatabaseAdapter {
-  async insert(): Promise<unknown> { throw new Error("No implementado"); }
-  async get(): Promise<unknown> { throw new Error("No implementado"); }
-  async update(): Promise<unknown> { throw new Error("No implementado"); }
-  async delete(): Promise<unknown> { throw new Error("No implementado"); }
+  async insert(table: string, data: Record<string, unknown>): Promise<unknown> { throw new Error("No implementado"); }
+  async get(table: string, matchQuery?: Record<string, unknown>): Promise<unknown> { throw new Error("No implementado"); }
+  async update(table: string, id: string, data: Record<string, unknown>): Promise<unknown> { throw new Error("No implementado"); }
+  async delete(table: string, id: string): Promise<unknown> { throw new Error("No implementado"); }
 }
 
 export class SupabaseAdapter extends DatabaseAdapter {
@@ -20,7 +21,6 @@ export class SupabaseAdapter extends DatabaseAdapter {
   async insert(table: string, data: Record<string, unknown>): Promise<unknown> {
     const { data: result, error } = await this.client.from(table).insert(data).select();
     if (error) {
-      // Eliminamos el console.error de aquí. Lanzamos el error directamente a la UI.
       throw error;
     }
     return result;
