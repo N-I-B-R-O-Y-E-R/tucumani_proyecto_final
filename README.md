@@ -1,3 +1,6 @@
+https://tucumani-proyecto-final20.vercel.app/login
+admin@cosmosgas.com
+admin123
 # ⛽ CosmosGas - Sistema de Gestión de Estación de Combustible
 
 Aplicación profesional y multiplataforma desarrollada bajo arquitectura MVC para la gestión integral de surtidores, ventas y alertas en estaciones de servicio.
