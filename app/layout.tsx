@@ -2,10 +2,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
-import Sidebar from "../components/Sidebar";
-import FloatingVoiceAssistant from "../components/FloatingVoiceAssistant";
 import AuthGuard from "../components/AuthGuard";
-import PWAInstaller from "../components/PWAInstaller"; // <-- Importamos el componente limpio
+import PWAInstaller from "../components/PWAInstaller";
+import AppLayout from "../components/AppLayout";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,6 +19,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <head>
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#0f172a" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
         <style>{`
           @media print {
             .no-print, aside { display: none !important; }
@@ -27,19 +27,15 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           }
         `}</style>
       </head>
-      <body className={`${inter.className} bg-gray-100 flex min-h-screen overflow-hidden`}>
-        
+      {/* CORRECCIÓN: Quitamos el "overflow-hidden" y "flex" para no bloquear la pantalla globalmente */}
+      <body className={inter.className}>
         <AuthGuard>
-          <Sidebar />
-          <main className="flex-1 overflow-y-auto relative h-screen">
+          <AppLayout>
             {children}
-            <FloatingVoiceAssistant />
-          </main>
+          </AppLayout>
         </AuthGuard>
 
-        {/* Carga del Service Worker sin advertencias en React */}
         <PWAInstaller />
-
       </body>
     </html>
   );
