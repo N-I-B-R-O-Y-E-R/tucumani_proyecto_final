@@ -8,21 +8,27 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
-    // Verificamos si existe una sesión activa en el navegador
-    const userRole = localStorage.getItem('userRole');
-    
-    if (!userRole && pathname !== '/login') {
-      // Si no hay sesión y no está en el login, lo expulsamos al login
+    const role = localStorage.getItem('userRole');
+
+    // 1. Si no hay sesión y no está en login, expulsar al login
+    if (!role && pathname !== '/login') {
       router.push('/login');
-    } else {
-      // Si todo está en orden, permitimos renderizar la aplicación
-      setIsAuthorized(true);
+      return;
     }
+
+    // 2. Si es CAJERO, encerrarlo SOLO en la pantalla de Ventas
+    if (role === 'Cajero' && pathname !== '/ventas' && pathname !== '/login') {
+      router.push('/ventas');
+      return;
+    }
+
+    // 3. Si todo está bien, mostrar la pantalla
+    setIsAuthorized(true);
   }, [pathname, router]);
 
-  // Mientras verifica, mostramos una pantalla en blanco para evitar "parpadeos"
+  // Evita parpadeos de pantallas prohibidas antes de redireccionar
   if (!isAuthorized && pathname !== '/login') {
-    return <div className="min-h-screen bg-gray-100"></div>; 
+    return <div className="h-screen w-screen bg-slate-900 flex items-center justify-center text-white font-bold">Verificando credenciales...</div>;
   }
 
   return <>{children}</>;
